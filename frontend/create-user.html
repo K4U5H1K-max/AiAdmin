@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create User</title>
+  <style>
+    :root {
+      --bg: #f6fff7;
+      --card: #ffffff;
+      --text: #1e293b;
+      --primary: #16a34a;
+      --secondary: #0ea5e9;
+      --border: #d9efe0;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #e8fff0, var(--bg));
+      color: var(--text);
+      font-family: Arial, sans-serif;
+    }
+
+    .wrap {
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 0 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+
+    input,
+    select,
+    button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 6px;
+      box-sizing: border-box;
+    }
+
+    button {
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 12px;
+      color: #fff;
+      background: var(--primary);
+    }
+
+    .secondary {
+      background: var(--secondary);
+    }
+
+    #result {
+      margin-top: 12px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <button class="secondary" onclick="location.href='index.html'">Dashboard</button>
+    <div class="card">
+      <h1>Create User</h1>
+      <label for="email">Email</label>
+      <input id="email" type="email" placeholder="newworker@example.com" />
+
+      <label for="password">Password</label>
+      <input id="password" type="text" placeholder="password123" />
+
+      <label for="license">License</label>
+      <select id="license">
+        <option value="basic">basic</option>
+        <option value="premium">premium</option>
+        <option value="plus">plus</option>
+      </select>
+
+      <button id="createBtn" type="button">Create User</button>
+      <div id="result"></div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://127.0.0.1:8000';
+
+    async function createUser() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const license = document.getElementById('license').value;
+      const resultEl = document.getElementById('result');
+
+      resultEl.textContent = 'Creating...';
+      try {
+        const response = await fetch(API_BASE + '/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, password: password, license: license }),
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          resultEl.textContent = JSON.stringify(data);
+          return;
+        }
+
+        resultEl.textContent = 'User created successfully. Redirecting to profile...';
+        setTimeout(() => {
+          location.href = 'user-profile.html?email=' + encodeURIComponent(email);
+        }, 1000);
+      } catch (error) {
+        resultEl.textContent = String(error);
+      }
+    }
+
+    document.getElementById('createBtn').addEventListener('click', createUser);
+  </script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard</title>
+  <style>
+    :root {
+      --bg: #eef6ff;
+      --card: #ffffff;
+      --text: #1e293b;
+      --primary: #2563eb;
+      --secondary: #16a34a;
+      --border: #d6e4ff;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #dfeeff, var(--bg));
+      color: var(--text);
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 520px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    .primary {
+      background: var(--primary);
+    }
+
+    .secondary {
+      background: var(--secondary);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Dashboard</h1>
+    <p>Select an action.</p>
+    <div class="buttons">
+      <button class="primary" onclick="location.href='search-users.html'">Search Users</button>
+      <button class="secondary" onclick="location.href='create-user.html'">Create User</button>
+    </div>
+  </div>
+</body>
+</html>

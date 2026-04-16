@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Profile</title>
+  <style>
+    :root {
+      --bg: #fff7ed;
+      --card: #ffffff;
+      --text: #1e293b;
+      --primary: #ea580c;
+      --secondary: #0ea5e9;
+      --danger: #dc2626;
+      --border: #f4d7c0;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #fff0e1, var(--bg));
+      color: var(--text);
+      font-family: Arial, sans-serif;
+    }
+
+    .wrap {
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 0 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      margin-top: 12px;
+    }
+
+    input,
+    select,
+    button {
+      padding: 8px;
+      margin-top: 6px;
+    }
+
+    button {
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      color: #fff;
+      background: var(--primary);
+      margin-right: 8px;
+    }
+
+    .secondary {
+      background: var(--secondary);
+    }
+
+    .danger {
+      background: var(--danger);
+    }
+
+    #result {
+      margin-top: 12px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <button class="secondary" onclick="location.href='index.html'">Dashboard</button>
+    <button class="secondary" onclick="location.href='search-users.html'">Search Users</button>
+
+    <div class="card">
+      <h1>User Profile</h1>
+      <p id="userInfo">Loading...</p>
+    </div>
+
+    <div class="card">
+      <h2>Reset Password</h2>
+      <input id="newPassword" type="text" placeholder="New password" />
+      <button id="resetBtn" type="button">Reset Password</button>
+    </div>
+
+    <div class="card">
+      <h2>Assign / Change License</h2>
+      <select id="licenseType">
+        <option value="basic">basic</option>
+        <option value="premium">premium</option>
+        <option value="plus">plus</option>
+      </select>
+      <button id="licenseBtn" type="button">Save License</button>
+    </div>
+
+    <div class="card">
+      <h2>Delete User</h2>
+      <button id="deleteBtn" class="danger" type="button">Delete User</button>
+    </div>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://127.0.0.1:8000';
+    const params = new URLSearchParams(window.location.search);
+    const email = params.get('email') || '';
+
+    async function loadUser() {
+      const infoEl = document.getElementById('userInfo');
+      if (!email) {
+        infoEl.textContent = 'No user email provided.';
+        return;
+      }
+
+      try {
+        const response = await fetch(API_BASE + '/users/' + encodeURIComponent(email));
+        const data = await response.json();
+
+        if (!response.ok) {
+          infoEl.textContent = JSON.stringify(data);
+          return;
+        }
+
+        infoEl.textContent = 'Email: ' + data.email + ' | License: ' + data.license;
+        document.getElementById('licenseType').value = data.license;
+      } catch (error) {
+        infoEl.textContent = String(error);
+      }
+    }
+
+    function setResult(message) {
+      document.getElementById('result').textContent = message;
+    }
+
+    async function resetPassword() {
+      const newPassword = document.getElementById('newPassword').value;
+      try {
+        const response = await fetch(API_BASE + '/users/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, new_password: newPassword }),
+        });
+        const data = await response.json();
+        setResult(JSON.stringify(data));
+      } catch (error) {
+        setResult(String(error));
+      }
+    }
+
+    async function assignLicense() {
+      const license = document.getElementById('licenseType').value;
+      try {
+        const response = await fetch(API_BASE + '/users/assign-license', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, license: license }),
+        });
+        const data = await response.json();
+        setResult(JSON.stringify(data));
+        loadUser();
+      } catch (error) {
+        setResult(String(error));
+      }
+    }
+
+    async function deleteUser() {
+      try {
+        const response = await fetch(API_BASE + '/users/' + encodeURIComponent(email), {
+          method: 'DELETE',
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          setResult(JSON.stringify(data));
+          return;
+        }
+
+        location.href = 'search-users.html';
+      } catch (error) {
+        setResult(String(error));
+      }
+    }
+
+    document.getElementById('resetBtn').addEventListener('click', resetPassword);
+    document.getElementById('licenseBtn').addEventListener('click', assignLicense);
+    document.getElementById('deleteBtn').addEventListener('click', deleteUser);
+
+    loadUser();
+  </script>
+</body>
+</html>

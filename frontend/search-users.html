@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search Users</title>
+  <style>
+    :root {
+      --bg: #f3f7ff;
+      --card: #ffffff;
+      --text: #1e293b;
+      --primary: #0b6cff;
+      --accent: #14b8a6;
+      --border: #d9e2f2;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #e8f0ff, var(--bg));
+      color: var(--text);
+      font-family: Arial, sans-serif;
+    }
+
+    .wrap {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    input,
+    button {
+      padding: 8px;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+
+    button {
+      border: none;
+      border-radius: 6px;
+      background: var(--primary);
+      color: #fff;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: var(--accent);
+    }
+
+    .user-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border);
+      padding: 8px 0;
+    }
+
+    .top-actions {
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top-actions">
+      <button class="secondary" onclick="location.href='index.html'">Dashboard</button>
+    </div>
+    <div class="card">
+      <h1>Search Users</h1>
+      <input id="searchEmail" type="text" placeholder="Search by email" />
+      <button id="searchBtn" type="button">Search</button>
+      <div id="results"></div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://127.0.0.1:8000';
+
+    async function searchUsers() {
+      const filter = document.getElementById('searchEmail').value.trim();
+      const resultsEl = document.getElementById('results');
+      resultsEl.innerHTML = 'Loading...';
+
+      try {
+        const response = await fetch(API_BASE + '/users?email=' + encodeURIComponent(filter));
+        const data = await response.json();
+
+        if (!response.ok) {
+          resultsEl.textContent = JSON.stringify(data);
+          return;
+        }
+
+        if (!data.users || data.users.length === 0) {
+          resultsEl.textContent = 'No users found';
+          return;
+        }
+
+        resultsEl.innerHTML = '';
+        data.users.forEach((user) => {
+          const row = document.createElement('div');
+          row.className = 'user-row';
+
+          const label = document.createElement('span');
+          label.textContent = user.email + ' (' + user.license + ')';
+
+          const openBtn = document.createElement('button');
+          openBtn.textContent = 'Open Profile';
+          openBtn.addEventListener('click', () => {
+            location.href = 'user-profile.html?email=' + encodeURIComponent(user.email);
+          });
+
+          row.appendChild(label);
+          row.appendChild(openBtn);
+          resultsEl.appendChild(row);
+        });
+      } catch (error) {
+        resultsEl.textContent = String(error);
+      }
+    }
+
+    document.getElementById('searchBtn').addEventListener('click', searchUsers);
+  </script>
+</body>
+</html>
