@@ -73,6 +73,7 @@
     </div>
     <div class="card">
       <h1>Search Users</h1>
+      <label for="searchEmail">Search users</label>
       <input id="searchEmail" type="text" placeholder="Search by email" />
       <button id="searchBtn" type="button">Search</button>
       <div id="results"></div>
@@ -110,7 +111,7 @@
           label.textContent = user.email + ' (' + user.license + ')';
 
           const openBtn = document.createElement('button');
-          openBtn.textContent = 'Open Profile';
+          openBtn.textContent = 'View';
           openBtn.addEventListener('click', () => {
             location.href = 'user-profile.html?email=' + encodeURIComponent(user.email);
           });
@@ -125,6 +126,12 @@
     }
 
     document.getElementById('searchBtn').addEventListener('click', searchUsers);
+
+    // Load all users if redirected from deletion
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('list') && params.get('list') === 'all') {
+      searchUsers();
+    }
   </script>
 </body>
 </html>

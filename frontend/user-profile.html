@@ -141,7 +141,12 @@
           body: JSON.stringify({ email: email, new_password: newPassword }),
         });
         const data = await response.json();
-        setResult(JSON.stringify(data));
+        if (!response.ok) {
+          setResult(JSON.stringify(data));
+          return;
+        }
+
+        setResult('Password reset successful');
       } catch (error) {
         setResult(String(error));
       }
@@ -174,7 +179,10 @@
           return;
         }
 
-        location.href = 'search-users.html';
+        setResult('User deleted successfully');
+        setTimeout(() => {
+          location.href = 'search-users.html?list=all';
+        }, 2000);
       } catch (error) {
         setResult(String(error));
       }
